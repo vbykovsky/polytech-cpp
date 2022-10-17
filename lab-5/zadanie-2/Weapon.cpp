@@ -20,8 +20,12 @@ float Weapon::getDamage() {
   return this->damage;
 }
 
-WeaponType Weapon::getType() {
+WeaponType Weapon::getType(){
   return this->type;
+}
+
+float Weapon::getFullDamage(){
+  return this->getDamage();
 }
 
 void Weapon::setDamage(float damage) {
@@ -29,9 +33,17 @@ void Weapon::setDamage(float damage) {
 }
 
 ostream& operator<<(ostream& out, Weapon& weapon) {
-  out << weapon.getTypeTitle() << " \"" << weapon.getTitle() << "\": damage=" << weapon.getDamage() << ", weight=" << weapon.getWeight() << "kg";
+  out << weapon.getTypeTitle() << " \"" << weapon.getTitle() << "\": damage=" << weapon.getFullDamage() << ", weight=" << weapon.getWeight() << "kg";
 
   return out;
+}
+
+bool Weapon::operator>(Weapon& weapon) {
+  return this->getFullDamage() > weapon.getFullDamage();
+}
+
+bool Weapon::operator<(Weapon& weapon) {
+  return this->getFullDamage() < weapon.getFullDamage();
 }
 
 bool Weapon::canTake(float maxWeight) {
