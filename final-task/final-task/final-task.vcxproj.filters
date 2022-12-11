@@ -21,7 +21,7 @@
     <ClCompile Include="Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Tree.cpp">
+    <ClCompile Include="AVLNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AVLTree.cpp">
@@ -29,6 +29,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AVLNode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Node.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

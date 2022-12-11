@@ -1,49 +1,63 @@
+#include <string>
+#include <vector>
 #include <iostream>
+#include <algorithm>
 
+#include "Node.hpp"
 #include "Tree.hpp"
+#include "AVLTree.hpp"
 
 using namespace std;
 
+size_t split(const string& txt, vector<string>& strs, char ch){
+  size_t pos = txt.find(ch);
+  size_t initialPos = 0;
+  strs.clear();
+
+  while (pos != string::npos) {
+    strs.push_back(txt.substr(initialPos, pos - initialPos));
+    initialPos = pos + 1;
+
+    pos = txt.find(ch, initialPos);
+  }
+
+  strs.push_back(txt.substr(initialPos, min(pos, txt.size()) - initialPos + 1));
+
+  return strs.size();
+}
+
 
 int main() {
-  #pragma region init tree
-  Node rootNode(10);
-  Node node1(5);
-  Node node2(15);
+  string inputStr = "";
+  getline(cin, inputStr);
 
-  rootNode.left = &node1;
-  rootNode.right = &node2;
+  vector<string> keysStrs;
+  auto keysCount = split(inputStr, keysStrs, ' ');
 
-  node1.parent = &rootNode;
-  node2.parent = &rootNode;
+  vector<int> keys;
+  for (auto keyStr: keysStrs) {
+    keys.push_back(stoi(keyStr));
+  }
 
-  Node node3(2);
-  Node node4(8);
+  sort(keys.begin(), keys.end());
 
-  node1.left = &node3;
-  node1.right = &node4;
+  Node AVLRootNode(keys[keysCount / 2]);
+  AVLTree AVLTree(&AVLRootNode);
 
-  node3.parent = &node1;
-  node4.parent = &node1;
+  Node AVLNodes[100] = {};
 
-  Node node5(12);
-  Node node6(18);
+  for (int i = 0; i < keysCount; i++) {
+    int key = keys[i];
 
-  node2.left = &node5;
-  node2.right = &node6;
+    AVLNodes[i] = *(AVLTree.insert(&AVLRootNode, key));
+    if (AVLNodes[i].isNotDefined()) {
+      cout << "Failed to insert ";
+      AVLNodes[i].print("AVLNodes[i]");
+    }
+  }
 
-  node5.parent = &node2;
-  node6.parent = &node2;
+  cout << endl;
 
-  Tree tree(&rootNode);
-
-  tree.pushNode(&node1);
-  tree.pushNode(&node2);
-  tree.pushNode(&node3);
-  tree.pushNode(&node4);
-  tree.pushNode(&node5);
-  tree.pushNode(&node6);
-  #pragma endregion
 
   return 0;
 }
