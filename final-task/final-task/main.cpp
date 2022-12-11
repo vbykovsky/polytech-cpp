@@ -36,7 +36,9 @@ int main() {
   cout << endl << "Your  sequence to get a balanced AVL tree:" << endl;
   tree.printBalancedOrder();
 
-  cout << endl;
+  cout << endl << endl;
+
+  system("pause");
 
   return 0;
 }
