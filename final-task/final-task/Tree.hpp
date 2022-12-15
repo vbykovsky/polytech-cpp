@@ -12,13 +12,13 @@ protected:
   Node* root = nullptr;
 
 public:
-  virtual int find(int value) const = 0;
+  virtual Node* find(int value) const = 0;
   virtual void insert(int value) = 0;
   virtual void erase(int value) = 0;
   virtual void clear() = 0;
 
 public:
-  virtual void balance(std::vector<Node**> path) = 0;
+  virtual void balance(std::vector<Node**> disbalancedNodesPtrs) = 0;
 
 public:
   virtual void display() = 0;

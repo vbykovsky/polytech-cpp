@@ -1,11 +1,8 @@
 #pragma once
 
-class Node {
+class Node abstract {
 public:
   const int value = -1;
-
-public:
-  int size = 0;
   
 public:
   Node* left = nullptr;
@@ -13,4 +10,7 @@ public:
 
 public:
   Node(int value);
+
+public:
+  virtual void display() = 0;
 };

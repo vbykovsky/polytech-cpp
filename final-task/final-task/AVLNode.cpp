@@ -3,12 +3,23 @@
 AVLNode::AVLNode(int value) : Node(value), height(1) {
 }
 
+void AVLNode::display() {
+  if (right != nullptr) {
+    std::cout << "     |---- " << "[" << right->value << "]" << std::endl;
+  }
+
+  std::cout << "|----[" << value << "]" << std::endl;
+
+  if (left != nullptr) {
+    std::cout << "     |---- " << "[" << left->value << "]" << std::endl;
+  }
+}
+
 void AVLNode::updateValues() {
   auto leftCount = 0;
   auto leftHeight = 0;
 
   if (left != nullptr) {
-    leftCount = left->size;
     leftHeight = left->height;
   }
 
@@ -16,11 +27,8 @@ void AVLNode::updateValues() {
   auto rightHeight = 0;
 
   if (right != nullptr) {
-    rightCount = right->size;
     rightHeight = right->height;
   }
-
-  size = leftCount + rightCount + 1;
 
   height = std::max(leftHeight, rightHeight) + 1;
 }

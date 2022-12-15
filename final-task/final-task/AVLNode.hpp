@@ -16,6 +16,9 @@ public:
   AVLNode(int value);
 
 public:
+  void display() override;
+
+public:
   void updateValues();
   int balanceFactor();
 

@@ -7,116 +7,107 @@ AVLTree::~AVLTree() {
   clear();
 }
 
-int AVLTree::find(int value) const {
-  AVLNode* direct = root;
-  int idx = 0;
+AVLNode* AVLTree::find(int value) const {
+  auto desiredNode = root;
 
-  while (direct != nullptr && direct->value != value) {
-    if (direct->value > value) {
-      direct = direct->left;
+  while (desiredNode != nullptr && desiredNode->value != value) {
+    if (desiredNode->value > value) {
+      desiredNode = desiredNode->left;
     }
     else {
-      idx += (direct->left ? direct->left->size : 0) + 1;
-      direct = direct->right;
+      desiredNode = desiredNode->right;
     }
   }
 
-  if (direct == nullptr) {
-    return -1;
-  }
-
-  return idx + (direct->left ? direct->left->size : 0);
+  return desiredNode;
 }
 
 void AVLTree::insert(int value) {
-  AVLNode** indirect = &root;
-  std::vector<AVLNode**> path;
+  auto newNodePtr = &root;
+  std::vector<AVLNode**> disbalancedNodesPtrs;
 
-  while (*indirect != nullptr) {
-    path.push_back(indirect);
+  while (*newNodePtr != nullptr) {
+    disbalancedNodesPtrs.push_back(newNodePtr);
 
-    if ((*indirect)->value > value) {
-      indirect = &((*indirect)->left);
+    if (value > (*newNodePtr)->value) {
+      newNodePtr = &((*newNodePtr)->right);
     }
     else {
-      indirect = &((*indirect)->right);
+      newNodePtr = &((*newNodePtr)->left);
     }
   }
 
-  *indirect = new AVLNode(value);
-  path.push_back(indirect);
+  *newNodePtr = new AVLNode(value);
+  disbalancedNodesPtrs.push_back(newNodePtr);
 
-  balance(path);
+  balance(disbalancedNodesPtrs);
   size++;
 }
 
 void AVLTree::erase(int value) {
-  AVLNode** indirect = &root;
-  std::vector<AVLNode**> path;
+  auto erasingNodePtr = &root;
+  std::vector<AVLNode**> disbalancedNodesPtrs;
 
-  while (*indirect != nullptr && (*indirect)->value != value) {
-    path.push_back(indirect);
+  while (*erasingNodePtr != nullptr && (*erasingNodePtr)->value != value) {
+    disbalancedNodesPtrs.push_back(erasingNodePtr);
 
-    if ((*indirect)->value > value) {
-      indirect = &((*indirect)->left);
+    if ((*erasingNodePtr)->value > value) {
+      erasingNodePtr = &((*erasingNodePtr)->left);
     }
     else {
-      indirect = &((*indirect)->right);
+      erasingNodePtr = &((*erasingNodePtr)->right);
     }
   }
 
-  if (*indirect == nullptr) {
+  if (*erasingNodePtr == nullptr) {
     return;
   }
+
+  // no children
+  if ((*erasingNodePtr)->left == nullptr && (*erasingNodePtr)->right == nullptr) {
+    delete* erasingNodePtr;
+    *erasingNodePtr = nullptr;
+  }
+  // only left child
+  else if ((*erasingNodePtr)->right == nullptr) {
+    auto trashPtr = *erasingNodePtr;
+
+    (*erasingNodePtr) = (*erasingNodePtr)->left;
+    delete trashPtr;
+  }
+  // with right child
   else {
-    path.push_back(indirect);
-  }
+    disbalancedNodesPtrs.push_back(erasingNodePtr);
+    auto erasingNodePtrIndex = disbalancedNodesPtrs.size();
 
-  size_t index = path.size();
+    auto erasingNodeRightChildWithoutLeftNodePtr = &((*erasingNodePtr)->right);
 
-  if ((*indirect)->left == nullptr && (*indirect)->right == nullptr) {
-    delete* indirect;
-    *indirect = nullptr;
-    path.pop_back();
-  }
-  else if ((*indirect)->right == nullptr) {
-    AVLNode* toRemove = *indirect;
-
-    (*indirect) = (*indirect)->left;
-    delete toRemove;
-
-    path.pop_back();
-  }
-  else {
-    AVLNode** successor = &((*indirect)->right);
-
-    while ((*successor)->left != nullptr) {
-      path.push_back(successor);
-      successor = &((*successor)->left);
+    while ((*erasingNodeRightChildWithoutLeftNodePtr)->left != nullptr) {
+      disbalancedNodesPtrs.push_back(erasingNodeRightChildWithoutLeftNodePtr);
+      erasingNodeRightChildWithoutLeftNodePtr = &((*erasingNodeRightChildWithoutLeftNodePtr)->left);
     }
 
-    if (*successor == (*indirect)->right) {
-      (*successor)->left = (*indirect)->left;
+    if (*erasingNodeRightChildWithoutLeftNodePtr == (*erasingNodePtr)->right) {
+      (*erasingNodeRightChildWithoutLeftNodePtr)->left = (*erasingNodePtr)->left;
 
-      AVLNode* toRemove = *indirect;
-      *indirect = *successor;
+      auto toRemove = *erasingNodePtr;
+      *erasingNodePtr = *erasingNodeRightChildWithoutLeftNodePtr;
       delete toRemove;
     }
-
     else {
-      AVLNode* tmp = *path.back(), * suc = *successor;
+      auto erasingNodeRightChildBeforeWithoutLeftNode = *disbalancedNodesPtrs.back(), erasingNodeRightChildWithoutLeftNode = *erasingNodeRightChildWithoutLeftNodePtr;
 
-      tmp->left = (*successor)->right;
-      suc->left = (*indirect)->left;
-      suc->right = (*indirect)->right;
+      erasingNodeRightChildBeforeWithoutLeftNode->left = (*erasingNodeRightChildWithoutLeftNodePtr)->right;
+      erasingNodeRightChildWithoutLeftNode->left = (*erasingNodePtr)->left;
+      erasingNodeRightChildWithoutLeftNode->right = (*erasingNodePtr)->right;
 
-      delete* indirect;
-      *indirect = suc;
-      path[index] = &(suc->right);
+      delete* erasingNodePtr;
+      *erasingNodePtr = erasingNodeRightChildWithoutLeftNode;
+      disbalancedNodesPtrs[erasingNodePtrIndex] = &(erasingNodeRightChildWithoutLeftNode->right);
     }
   }
 
-  balance(path);
+  balance(disbalancedNodesPtrs);
   size--;
 }
 
@@ -194,9 +185,9 @@ void AVLTree::display() {
   std::cout << std::endl;
 }
 
-void AVLTree::display(AVLNode* cur, int depth, int state /* (0: root, 1: left, 2: right) */) {
-  if (cur->right) {
-    display(cur->right, depth + 1, 2);
+void AVLTree::display(AVLNode* node, int depth, int state /* (0: root, 1: left, 2: right) */) {
+  if (node->right) {
+    display(node->right, depth + 1, 2);
   }
 
   for (int i = 0; i < depth; i++) {
@@ -205,14 +196,14 @@ void AVLTree::display(AVLNode* cur, int depth, int state /* (0: root, 1: left, 2
 
   std::cout << "|----";
 
-  std::cout << "[" << cur->value << "]" << std::endl;
+  std::cout << "[" << node->value << "]" << std::endl;
 
-  if (cur->left) {
-    display(cur->left, depth + 1, 1);
+  if (node->left) {
+    display(node->left, depth + 1, 1);
   }
 }
 
-void AVLTree::printBalancedOrder() {
+void AVLTree::displayBalancedOrder() {
   std::vector<AVLNode*> order;
 
   order.push_back(root);

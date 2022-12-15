@@ -21,7 +21,7 @@ int main() {
     int x;
     cin >> x;
 
-    if (tree.find(x) == -1) {
+    if (tree.find(x) == nullptr) {
       tree.insert(x);
     }
     else {
@@ -34,7 +34,7 @@ int main() {
   tree.display();
 
   cout << endl << "Your  sequence to get a balanced AVL tree:" << endl;
-  tree.printBalancedOrder();
+  tree.displayBalancedOrder();
 
   cout << endl << endl;
 
