@@ -148,26 +148,26 @@ bool AVLTree::isEmpty() const {
 void AVLTree::balance(std::vector<AVLNode**> path) {
   reverse(path.begin(), path.end());
 
-  for (auto indirect : path) {
-    (*indirect)->updateValues();
+  for (auto node : path) {
+    (*node)->updateValues();
 
     // left - left
-    if ((*indirect)->balanceFactor() >= 2 && (*indirect)->left->balanceFactor() >= 1) {
-      *indirect = (*indirect)->rightRotate();
+    if ((*node)->balanceFactor() >= 2 && (*node)->left->balanceFactor() >= 1) {
+      *node = (*node)->rightRotate();
     }
     // left - right
-    else if ((*indirect)->balanceFactor() >= 2) {
-      (*indirect)->left = (*indirect)->left->leftRotate();
-      *indirect = (*indirect)->rightRotate();
+    else if ((*node)->balanceFactor() >= 2) {
+      (*node)->left = (*node)->left->leftRotate();
+      *node = (*node)->rightRotate();
     }
     // right - right
-    else if ((*indirect)->balanceFactor() <= -2 && (*indirect)->right->balanceFactor() <= -1) {
-      *indirect = (*indirect)->leftRotate();
+    else if ((*node)->balanceFactor() <= -2 && (*node)->right->balanceFactor() <= -1) {
+      *node = (*node)->leftRotate();
     }
     // right - left
-    else if ((*indirect)->balanceFactor() <= -2) {
-      (*indirect)->right = ((*indirect)->right)->rightRotate();
-      *indirect = (*indirect)->leftRotate();
+    else if ((*node)->balanceFactor() <= -2) {
+      (*node)->right = ((*node)->right)->rightRotate();
+      *node = (*node)->leftRotate();
     }
   }
 }
